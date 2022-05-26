@@ -1,0 +1,21 @@
+.toolbar {
+  background-color: var(--toolbar-background-color);
+  height: var(--toolbar-height);
+  display: flex;
+}
+
+.toolbar-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.toolbar-actions > * {
+  cursor: pointer;
+  margin: 0 12px;
+}
+
+.is-highlighted {
+  fill: rgb(96, 255, 96) !important;
+}

@@ -5,6 +5,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* css global variables */
+  --toolbar-height: 50px;
+  --toolbar-background-color: black;
 }
 
 code {

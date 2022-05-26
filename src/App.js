@@ -1,23 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
 
+import { useState } from 'react';
+
+import { Actions } from './settings/Constants.settings';
+
+import { Toolbar } from './components/Toolbar/Toolbar';
+import { Playground } from './components/Playground/Playground';
+
 function App() {
+  const [action, setAction] = useState(Actions.None);
+
+  const setActionState = (action) => {
+    setAction(action);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Playground action={action} />
+      <Toolbar setAction={setActionState} />
     </div>
   );
 }
