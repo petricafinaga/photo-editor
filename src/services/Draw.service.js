@@ -1,5 +1,5 @@
 const drawImage = ({ imageSource, drawArea }) => {
-  const { clientWidth, clientHeight } = drawArea.current;
+  const { clientWidth } = drawArea.current;
   const obj = {
     type: 'image',
     props: {

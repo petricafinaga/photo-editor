@@ -1,79 +1,92 @@
 import './Playground.css';
 
-import { useEffect, useState } from 'react';
+import { PureComponent } from 'react';
 import ZingTouch from 'zingtouch';
+import Gestures from 'westures';
 
 import { Actions } from '../../settings/Constants.settings';
-
 import { DrawArea } from './../DrawArea/DrawArea';
 
 const playgroundId = 'playground';
 
-export const Playground = ({ action }) => {
-  const [zingRegion, setZingRegion] = useState(null);
-  const [playground, setPlayground] = useState(null);
-  const [displayValue, setDisplayValue] = useState(0);
+export class Playground extends PureComponent {
+  wesRegion;
+  zingRegion;
+  playground;
 
-  // Values used to manipulate canvas drawings
-  const [rotationAngle, setRotationAngle] = useState(0);
-  const [scale, setScale] = useState(1);
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
-    if (!zingRegion || !playground) return;
+    this.state = {
+      displayValue: 0,
+      gesture: null,
 
-    // Unbind to all zing touch events
-    zingRegion.unbind(playground);
+      // Values used to manipulate canvas drawings
+      rotationAngle: 0,
+      scale: 1,
+    }
+  }
+
+  componentDidMount() {
+    const playgroundElement = document.getElementById(playgroundId);
+    this.playground = playgroundElement;
+
+    this.zingRegion = new ZingTouch.Region(playgroundElement);
+    this.wesRegion = new Gestures.Region(playgroundElement);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { action } = this.props;
+    if (prevProps.action === action) return;
+
+    // Unregister to last used gesture
+    this.zingRegion.unbind(this.playground);
+    if (this.state.gesture) {
+      this.wesRegion.removeGesture(this.state.gesture);
+      this.setState({ gesture: null });
+    }
 
     switch (action) {
       case Actions.Rotate:
-        zingRegion.bind(playground, action, (e) => {
-          setRotationAngle(prevValue => {
-            return parseInt(prevValue + e.detail.distanceFromLast) % 360;
-          });
+        this.zingRegion.bind(this.playground, action, (e) => {
+          const value = parseInt(this.state.rotationAngle + e.detail.distanceFromLast) % 360;
+          this.setState({ rotationAngle: value, displayValue: value });
         });
-        setDisplayValue(rotationAngle);
         break;
 
-      case Actions.Pinch:
-        zingRegion.bind(playground, action, (e) => {
-          // setRotationAngle(e.detail.distanceFromLast);
-          console.log('pinch -- ', e.detail, e.detail.distanceFromLast);
+      case Actions.Zoom:
+        const zoomGesture = new Gestures.Pinch(this.playground, (e) => {
+          const zoomFactor = this.state.scale < 1.5 ? 0.01 : 0.05;
+          const zoom = this.state.scale + (e.scale > 1 ? zoomFactor : -zoomFactor);
+          const value = parseFloat(zoom < 0 ? 0 : zoom > 5 ? 5 : zoom);
+
+          this.setState({ scale: value, displayValue: value });
         });
-        setDisplayValue(scale);
-        break;
-      case Actions.Expand:
-        zingRegion.bind(playground, 'expand', (e) => {
-          // setRotationAngle(e.detail.distanceFromLast);
-          console.log('expand -- ', e.detail, e.detail.distanceFromLast);
-        });
-        setDisplayValue(scale);
+        this.wesRegion.addGesture(zoomGesture);
+        this.setState({ gesture: zoomGesture });
         break;
 
       case Actions.None:
       default:
         break;
     };
-  }, [action, zingRegion, playground, scale, rotationAngle]);
+  }
 
-  useEffect(() => {
-    const playgroundElement = document.getElementById(playgroundId);
-    setPlayground(playgroundElement);
-
-    setZingRegion(new ZingTouch.Region(playgroundElement));
-  }, []);
-
-  return (
-    <>
-      <div id={playgroundId} className="playground">
-        <DrawArea
-          rotationAngle={rotationAngle}
-          scale={scale}
-        />
+  render() {
+    const { action } = this.props;
+    return <>
+      <div id={playgroundId}>
+        <div className="playground">
+          <DrawArea
+            rotationAngle={this.state.rotationAngle}
+            scale={this.state.scale}
+          />
+        </div>
       </div>
 
       {action !== Actions.None &&
         <div className="show-value">
-          {displayValue}
+          {this.state.displayValue}
         </div>
       }
       <div className="actions">
@@ -84,33 +97,22 @@ export const Playground = ({ action }) => {
             min={-180}
             max={180}
             step={1}
-            value={rotationAngle < -180 || rotationAngle > 180 ? rotationAngle % 180 : rotationAngle}
-            onChange={(e) => { setRotationAngle(parseInt(e.target.value)) }}
+            value={this.state.rotationAngle}
+            onChange={(e) => { this.setState({ rotationAngle: e.target.value, displayValue: e.target.value }); }}
           />
         }
-        {action === Actions.Pinch &&
+        {action === Actions.Zoom &&
           <input
             className="slider"
             type="range"
             min={0}
-            max={1}
+            max={5}
             step={0.1}
-            value={scale}
-            onChange={(e) => { setScale(parseFloat(e.target.value)) }}
-          />
-        }
-        {action === Actions.Expand &&
-          <input
-            className="slider"
-            type="range"
-            min={1}
-            max={3}
-            step={0.1}
-            value={scale}
-            onChange={(e) => { setScale(parseFloat(e.target.value)) }}
+            value={this.state.scale}
+            onChange={(e) => { this.setState({ scale: e.target.value, displayValue: e.target.value }); }}
           />
         }
       </div>
     </>
-  );
+  }
 };
