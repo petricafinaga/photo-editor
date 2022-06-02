@@ -37,8 +37,34 @@ const updateElementPosition = ({ el, x, y, text, color, fontSize }) => {
   el.children = [text];
 };
 
+const freeDraw = ({ id, color, strokeWidth, x, y }) => {
+  const obj = {
+    type: 'polyline',
+    id,
+    props: {
+      points: `${x},${y} `,
+      strokeWidth,
+      stroke: color,
+      fill: 'none',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+    },
+    children: [],
+  }
+
+  return obj;
+};
+
+const updateFreeDraw = ({ el, x, y, color, strokeWidth }) => {
+  el.props.points += `${x},${y} `;
+  el.props.stroke = color;
+  el.props.strokeWidth = strokeWidth;
+};
+
 export const DrawService = {
   drawImage,
   drawText,
   updateElementPosition,
+  freeDraw,
+  updateFreeDraw,
 };

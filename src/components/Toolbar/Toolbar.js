@@ -6,7 +6,7 @@ import { FileService } from './../../services/File.service';
 import { ICON_COLOR, ICON_SIZE } from '../../settings/Style.settings';
 import { Actions } from '../../settings/Constants.settings';
 
-import { PlusCircle, ArrowRepeat, ArrowsAngleContract, Pencil, Fonts } from 'react-bootstrap-icons';
+import { PlusCircle, ArrowRepeat, ArrowsAngleContract, Pencil, Fonts, FiletypePng } from 'react-bootstrap-icons';
 
 export const Toolbar = ({ setAction }) => {
   const [highlighted, setHighlighted] = useState(Actions.None);
@@ -55,7 +55,14 @@ export const Toolbar = ({ setAction }) => {
           onClick={() => setActionButton(Actions.Text)}
         />
 
+        <FiletypePng
+          color={ICON_COLOR}
+          size={ICON_SIZE}
+          onClick={() => FileService.downloadImage()}
+        />
+
         <input type='file' ref={fileInputRef} className="display-none" />
+        <canvas id='canvas' className="display-none" />
       </div>
     </div>
   );

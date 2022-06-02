@@ -15,7 +15,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" style={{ touchAction: 'pan-x pan-y' }}>
       <Playground action={action} />
       <Toolbar setAction={setActionState} />
     </div>

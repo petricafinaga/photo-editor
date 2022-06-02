@@ -21,6 +21,7 @@ export class Playground extends PureComponent {
       displayValue: 0,
       gesture: null,
       drawText: false,
+      freeDraw: false,
 
       // Values used to manipulate canvas drawings
       rotationAngle: 0,
@@ -44,7 +45,7 @@ export class Playground extends PureComponent {
     if (prevProps.action === action) return;
 
     // Unregister to last used gesture
-    this.setState({ drawText: false, text: '' });
+    this.setState({ drawText: false, text: '', freeDraw: false });
     this.zingRegion.unbind(this.playground);
     if (this.state.gesture) {
       this.wesRegion.removeGesture(this.state.gesture);
@@ -72,6 +73,7 @@ export class Playground extends PureComponent {
         break;
 
       case Actions.Draw:
+        this.setState({ freeDraw: true });
         break;
 
       case Actions.Text:
@@ -87,9 +89,10 @@ export class Playground extends PureComponent {
   render() {
     const { action } = this.props;
     return <>
-      <div id={playgroundId} style={{ touchAction: 'pan-x pan-y'}}>
+      <div id={playgroundId}>
         <div className="playground">
           <DrawArea
+            freeDraw={this.state.freeDraw}
             drawText={this.state.drawText}
             color={this.state.color}
             text={this.state.text}

@@ -23,6 +23,7 @@ export class DrawArea extends PureComponent {
   }
 
   handleClick = (e) => {
+    // Text draw starts here
     if (this.props.drawText) {
       const lastCreatedElement = this.state.objects[this.state.objects.length - 1];
 
@@ -43,6 +44,28 @@ export class DrawArea extends PureComponent {
         const elements = [...this.state.objects, el];
         this.setState({ objects: elements });
       }
+
+      // Free draw starts here
+    } else if (this.props.freeDraw) {
+      const lastCreatedElement = this.state.objects[this.state.objects.length - 1];
+      const { color, strokeWidth } = this.props;
+
+      // Update properties of the last element
+      if (lastCreatedElement?.id === this.objId) {
+        console.log(lastCreatedElement);
+        DrawService.updateFreeDraw({ el: lastCreatedElement, x: e.clientX, y: e.clientY, color, strokeWidth, })
+        const elements = [...this.state.objects];
+        elements.pop();
+        elements.push(lastCreatedElement);
+
+        this.setState({ objects: elements });
+      } else {
+        // Means that we need to create another text element
+        const el = DrawService.freeDraw({ id: this.objId, color, strokeWidth, x: e.clientX, y: e.clientY });
+
+        const elements = [...this.state.objects, el];
+        this.setState({ objects: elements });
+      }
     }
   }
 
@@ -58,6 +81,10 @@ export class DrawArea extends PureComponent {
     }
 
     if (prevProps.drawText !== this.props.drawText && !this.props.drawText) {
+      this.objId++;
+    }
+
+    if (prevProps.freeDraw !== this.props.freeDraw && !this.props.freeDraw) {
       this.objId++;
     }
   }
