@@ -20,10 +20,14 @@ export class Playground extends PureComponent {
     this.state = {
       displayValue: 0,
       gesture: null,
+      drawText: false,
 
       // Values used to manipulate canvas drawings
       rotationAngle: 0,
       scale: 1,
+      color: '#FF0000',
+      stroke: 20,
+      text: '',
     }
   }
 
@@ -31,7 +35,7 @@ export class Playground extends PureComponent {
     const playgroundElement = document.getElementById(playgroundId);
     this.playground = playgroundElement;
 
-    this.zingRegion = new ZingTouch.Region(playgroundElement);
+    this.zingRegion = new ZingTouch.Region(playgroundElement, [], false);
     this.wesRegion = new Gestures.Region(playgroundElement);
   }
 
@@ -40,6 +44,7 @@ export class Playground extends PureComponent {
     if (prevProps.action === action) return;
 
     // Unregister to last used gesture
+    this.setState({ drawText: false, text: '' });
     this.zingRegion.unbind(this.playground);
     if (this.state.gesture) {
       this.wesRegion.removeGesture(this.state.gesture);
@@ -66,6 +71,13 @@ export class Playground extends PureComponent {
         this.setState({ gesture: zoomGesture });
         break;
 
+      case Actions.Draw:
+        break;
+
+      case Actions.Text:
+        this.setState({ drawText: true });
+        break;
+
       case Actions.None:
       default:
         break;
@@ -75,16 +87,20 @@ export class Playground extends PureComponent {
   render() {
     const { action } = this.props;
     return <>
-      <div id={playgroundId}>
+      <div id={playgroundId} style={{ touchAction: 'pan-x pan-y'}}>
         <div className="playground">
           <DrawArea
+            drawText={this.state.drawText}
+            color={this.state.color}
+            text={this.state.text}
+            strokeWidth={this.state.stroke}
             rotationAngle={this.state.rotationAngle}
             scale={this.state.scale}
           />
         </div>
       </div>
 
-      {action !== Actions.None &&
+      {action !== Actions.None && action !== Actions.Draw && action !== Actions.Text &&
         <div className="show-value">
           {this.state.displayValue}
         </div>
@@ -111,6 +127,34 @@ export class Playground extends PureComponent {
             value={this.state.scale}
             onChange={(e) => { this.setState({ scale: e.target.value, displayValue: e.target.value }); }}
           />
+        }
+        {(action === Actions.Draw || action === Actions.Text) &&
+          <>
+            <input
+              className="draw-action color-picker"
+              type="color"
+              value={this.state.color}
+              onChange={(e) => { this.setState({ color: e.target.value }); }}
+            />
+
+            <input
+              className=" draw-action stroke-width"
+              type="number"
+              pattern="/^[0-9]*$/"
+              min="0"
+              max="100"
+              value={this.state.stroke}
+              onChange={(e) => { this.setState({ stroke: e.target.value }); }}
+            />
+            {action === Actions.Text &&
+              <input
+                className=" draw-action text-value"
+                type="text"
+                value={this.state.text}
+                onChange={(e) => { this.setState({ text: e.target.value }); }}
+              />
+            }
+          </>
         }
       </div>
     </>

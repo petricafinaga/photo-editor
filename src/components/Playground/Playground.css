@@ -26,6 +26,16 @@
   min-height: 27px;
 }
 
+.draw-action {
+  margin: 0 10px;
+  text-align: center;
+}
+
+.color-picker,
+.stroke-width {
+  width: 25px;
+}
+
 .slider {
   -webkit-appearance: none;
   width: 90%;
@@ -60,4 +70,8 @@
   border-radius: 50%;
   background: rgb(41, 255, 41);
   cursor: pointer;
+}
+
+input[type="color" i] {
+  border: 0;
 }

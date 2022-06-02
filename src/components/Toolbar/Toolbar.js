@@ -6,7 +6,7 @@ import { FileService } from './../../services/File.service';
 import { ICON_COLOR, ICON_SIZE } from '../../settings/Style.settings';
 import { Actions } from '../../settings/Constants.settings';
 
-import { PlusCircle, ArrowRepeat, ArrowsAngleContract } from 'react-bootstrap-icons';
+import { PlusCircle, ArrowRepeat, ArrowsAngleContract, Pencil, Fonts } from 'react-bootstrap-icons';
 
 export const Toolbar = ({ setAction }) => {
   const [highlighted, setHighlighted] = useState(Actions.None);
@@ -41,6 +41,18 @@ export const Toolbar = ({ setAction }) => {
           size={ICON_SIZE}
           className={`${isHighlighted(Actions.Zoom)}`}
           onClick={() => setActionButton(Actions.Zoom)}
+        />
+        <Pencil
+          color={ICON_COLOR}
+          size={ICON_SIZE}
+          className={`${isHighlighted(Actions.Draw)}`}
+          onClick={() => setActionButton(Actions.Draw)}
+        />
+        <Fonts
+          color={ICON_COLOR}
+          size={ICON_SIZE}
+          className={`${isHighlighted(Actions.Text)}`}
+          onClick={() => setActionButton(Actions.Text)}
         />
 
         <input type='file' ref={fileInputRef} className="display-none" />
